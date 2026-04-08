@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube AI Assistant</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a0f;--surf:#111118;--surf2:#1a1a24;
+      --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);
+      --txt:#f0f0f4;--dim:#8888a0;--mut:#55556a;
+      --red:#ff1744;--ora:#ff6d00;--grn:#00e676;--amb:#ffab00;--blu:#448aff;
+      --ds:#6c63ff;--gq:#00bcd4;
+    }
+    body{width:360px;background:var(--bg);color:var(--txt);font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+
+    .hd{padding:18px 18px 14px;background:linear-gradient(155deg,rgba(255,23,68,0.09) 0%,transparent 65%);border-bottom:1px solid var(--bd)}
+    .hd-row{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;background:linear-gradient(135deg,var(--red),var(--ora));border-radius:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,23,68,0.32);color:#fff;flex-shrink:0;overflow:hidden}
+    .logo img{width:44px;height:44px;border-radius:13px;object-fit:cover}
+    .hd-text h1{font-size:15px;font-weight:700;letter-spacing:-.02em}
+    .hd-text p{font-size:11px;color:var(--mut);margin-top:2px}
+    .vbadge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.15);color:var(--grn);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:9px;letter-spacing:.04em}
+    .pdot{width:5px;height:5px;border-radius:50%;background:var(--grn);animation:pulse 1.4s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bd);border-bottom:1px solid var(--bd)}
+    .stat{background:var(--surf);padding:13px;text-align:center}
+    .sv{font-size:20px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:4px}
+    .sv.g{color:var(--grn)}.sv.a{color:var(--amb)}.sv.b{color:var(--blu)}
+    .sl{font-size:9.5px;color:var(--mut);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+
+    .sec{padding:14px 18px;border-bottom:1px solid var(--bd)}
+    .sec-t{font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;margin-bottom:11px}
+
+    /* Provider chain */
+    .chain{display:flex;flex-direction:column;gap:2px}
+    .carr{font-size:9.5px;color:var(--mut);text-align:center;padding:1px 0}
+    .pi{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;border:1px solid transparent;transition:all .2s}
+    .pi.live{background:rgba(255,23,68,0.06);border-color:rgba(255,23,68,0.15)}
+    .pi.ds.live{background:rgba(108,99,255,0.07);border-color:rgba(108,99,255,0.2)}
+    .pi.gq.live{background:rgba(0,188,212,0.06);border-color:rgba(0,188,212,0.2)}
+    .pd{width:8px;height:8px;border-radius:50%;background:var(--mut);flex-shrink:0;transition:background .2s}
+    .pi.live .pd{background:var(--red)}.pi.ds.live .pd{background:var(--ds)}.pi.gq.live .pd{background:var(--gq)}
+    .pb strong{display:block;font-size:12px;color:var(--txt);margin-bottom:1px}
+    .pb span{font-size:11px;color:var(--mut)}
+    .pt{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:auto;flex-shrink:0}
+    .pt.free{background:rgba(0,230,118,0.1);color:var(--grn);border:1px solid rgba(0,230,118,0.15)}
+    .pt.key{background:rgba(255,171,0,0.1);color:var(--amb);border:1px solid rgba(255,171,0,0.15)}
+
+    /* Key input */
+    .kr{display:flex;gap:6px}
+    .ki{flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:11px;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .2s}
+    .ki:focus{border-color:rgba(255,171,0,.4)}.ki::placeholder{color:var(--mut)}
+    .kb{padding:8px 13px;border-radius:8px;border:none;background:var(--amb);color:#000;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+    .kb:hover{background:#ffc400}
+    .kh{font-size:10px;color:var(--mut);margin-top:7px;line-height:1.6}
+    .kh a{color:var(--amb);text-decoration:none}.kh a:hover{text-decoration:underline}
+    .ks{margin-top:7px;font-size:10.5px;display:flex;align-items:center;gap:5px}
+    .ks.ok{color:var(--grn)}.ks.na{color:var(--mut)}
+    .kd{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+
+    /* Steps */
+    .steps{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .step{display:flex;align-items:flex-start;gap:9px}
+    .sn{width:21px;height:21px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--ora));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .st{font-size:12px;color:var(--dim);line-height:1.4}.st strong{color:var(--txt)}
+
+    .info-box{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(68,138,255,.05);border:1px solid rgba(68,138,255,.12);border-radius:10px;margin-top:10px}
+    .info-box-icon{font-size:18px;flex-shrink:0}
+    .info-box strong{display:block;font-size:12px;color:var(--txt);margin-bottom:2px}
+    .info-box span{font-size:11px;color:var(--mut);line-height:1.4}
+
+    .footer{padding:9px 18px 12px;text-align:center;font-size:10px;color:var(--mut);border-top:1px solid var(--bd)}
+  </style>
+</head>
+<body>
+
+  <!-- Header with new icon -->
+  <div class="hd">
+    <div class="hd-row">
+      <div class="logo">
+        <img src="icons/icon48.png" alt="YAI"/>
+      </div>
+      <div class="hd-text">
+        <h1>YouTube AI Assistant</h1>
+        <p>Gemini · DeepSeek · Groq — Auto-fallback</p>
+      </div>
+    </div>
+    <div class="vbadge"><span class="pdot"></span> v5.1 · Free · No limits</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="sv g" id="key-val">—</div><div class="sl">Gemini Key</div></div>
+    <div class="stat"><div class="sv a" id="req-count">0</div><div class="sl">Requests</div></div>
+    <div class="stat"><div class="sv b" id="cache-count">0</div><div class="sl">Cached</div></div>
+  </div>
+
+  <!-- Provider Chain -->
+  <div class="sec">
+    <p class="sec-t">🤖 AI Fallback Chain</p>
+    <div class="chain">
+      <div class="pi" id="p-gemini">
+        <div class="pd"></div>
+        <div class="pb"><strong>1. Gemini 2.5 Flash</strong><span>Your key — highest limits + latest model</span></div>
+        <span class="pt key" id="gemini-tag">No key</span>
+      </div>
+      <div class="carr">↓ if limit hit</div>
+      <div class="pi ds" id="p-deepseek">
+        <div class="pd"></div>
+        <div class="pb"><strong>2. DeepSeek Chat</strong><span>Built-in key · Auto-activates</span></div>
+        <span class="pt free">Built-in</span>
+      </div>
+      <div class="carr">↓ if limit hit</div>
+      <div class="pi gq" id="p-groq">
+        <div class="pd"></div>
+        <div class="pb"><strong>3. Groq · Llama 3.3 70B</strong><span>Built-in key · Final backup</span></div>
+        <span class="pt free">Built-in</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Keys (optional) -->
+  <div class="sec">
+    <p class="sec-t">🔑 Your API Keys <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--mut)">(optional)</span></p>
+    <div class="chain">
+      <div class="kr" style="margin-bottom:6px">
+        <input class="ki" id="key-input-gemini" type="password" placeholder="Gemini Key (AIzaSy…)" autocomplete="off"/>
+      </div>
+      <div class="kr" style="margin-bottom:6px">
+        <input class="ki" id="key-input-deepseek" type="password" placeholder="DeepSeek Key (sk-…)" autocomplete="off"/>
+      </div>
+      <div class="kr" style="margin-bottom:6px">
+        <input class="ki" id="key-input-groq" type="password" placeholder="Groq Key (gsk_…)" autocomplete="off"/>
+      </div>
+      <button class="kb" id="key-save" style="width:100%;margin-top:2px;">Save Keys</button>
+    </div>
+    <div class="kh" style="margin-top:10px">Free Gemini key → <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a><br>Without your keys, the extension runs on built-in default keys.</div>
+    <div class="ks na" id="key-status"><span class="kd"></span><span id="key-st-text">Using built-in keys</span></div>
+  </div>
+
+  <!-- How to use -->
+  <div class="sec" style="border-bottom:0">
+    <p class="sec-t" style="margin-bottom:10px">How to use</p>
+    <div class="steps">
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="st">Open any <strong>YouTube video</strong></div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="st">Click the <strong style="color:var(--red)">✦ red button</strong> (bottom-right)</div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div class="st">Pick your AI provider from the header: <strong>Auto / G / DS / GQ</strong></div>
+      </div>
+      <div class="step">
+        <div class="sn">4</div>
+        <div class="st">Use <strong>Chat</strong>, <strong>Search</strong>, or <strong>📖 Browser</strong> tabs · Drag panel to resize</div>
+      </div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">📖</div>
+      <div>
+        <strong>Wikipedia Browser (fixed!)</strong>
+        <span>Now reads Wikipedia via API — no iframe blocks, works 100% of the time.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">YouTube AI Assistant v5.1 · Keys stored locally</div>
+  <script src="popup.js"></script>
+</body>
+</html>

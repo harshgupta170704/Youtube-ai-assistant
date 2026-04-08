@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube AI Assistant",
+  "version": "5.0.0",
+  "description": "AI assistant for YouTube — Gemini + DeepSeek + Groq fallback, web search, built-in browser, resizable panel.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.deepseek.com/*",
+    "https://api.groq.com/*",
+    "https://api.duckduckgo.com/*",
+    "https://en.wikipedia.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": [
+        "utils/transcript.js",
+        "utils/rag.js",
+        "content.js"
+      ],
+      "css": ["panel.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube AI Assistant",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
